@@ -1,7 +1,6 @@
 import Head from "next/head";
-import { Button, Flex, Heading, useDisclosure, Text, Link as ChakraLink } from "@chakra-ui/react";
+import { Button, Flex, Heading, useDisclosure, Text, useMediaQuery, Link as ChakraLink } from "@chakra-ui/react";
 import { canSSRAuth } from "@/utils/canSSRAuth";
-import { useMediaQuery } from "@chakra-ui/react";
 import { Sidebar } from "@/components/sidebar";
 import Link from "next/link";
 import { IoMdPerson } from "react-icons/io";
