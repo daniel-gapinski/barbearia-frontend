@@ -6,7 +6,7 @@ import { Sidebar } from "@/components/sidebar";
 import { FiChevronLeft } from "react-icons/fi";
 import Link from "next/link";
 import { setupAPIClient } from "@/services/api";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import Router from "next/router";
 import { Switch } from "@/components/ui/switch";
 
@@ -34,14 +34,27 @@ export default function EditHaircut({ subscription, haircut }: EditHaircutProps)
     const [price, setPrice] = useState(haircut ? haircut?.price : "");
     const [status, setStatus] = useState<boolean>(haircut?.status);
 
-    console.log(status)
+    const [isMobile, setIsMobile] = useState(false);
 
-    const [isMobile] = useMediaQuery(["(max-width: 500px)"], {
-        ssr: false,
-      });
+    useEffect(() => {
+        // Verifica se o código está sendo executado no cliente
+        if (typeof window !== "undefined") {
+            const mediaQuery = window.matchMedia("(max-width: 500px)");
+            setIsMobile(mediaQuery.matches);
+
+            // Adiciona um event listener para detectar mudanças na largura da tela
+            const handleChange = () => setIsMobile(mediaQuery.matches);
+            mediaQuery.addEventListener("change", handleChange);
+
+            // Limpeza do event listener quando o componente for desmontado
+            return () => {
+                mediaQuery.removeEventListener("change", handleChange);
+            };
+        }
+    }, []);
 
     function handleChangeStatus() {
-        setStatus(prevStatus => !prevStatus); 
+        setStatus(prevStatus => !prevStatus);
     }
 
     async function handleUpdate() {

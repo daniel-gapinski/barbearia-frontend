@@ -5,7 +5,7 @@ import { Sidebar } from "@/components/sidebar";
 import { FiChevronLeft } from "react-icons/fi";
 import Link from "next/link";
 import { setupAPIClient } from "@/services/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Router from "next/router";
 
 interface NewHaircutProps {
@@ -15,9 +15,25 @@ interface NewHaircutProps {
 
 export default function NewHaircut({ subscription, count }: NewHaircutProps) {
 
-    const [isMobile] = useMediaQuery(["(max-width: 500px)"], {
-        ssr: false,
-      });
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        // Verifica se o código está sendo executado no cliente
+        if (typeof window !== "undefined") {
+            const mediaQuery = window.matchMedia("(max-width: 500px)");
+            setIsMobile(mediaQuery.matches);
+
+            // Adiciona um event listener para detectar mudanças na largura da tela
+            const handleChange = () => setIsMobile(mediaQuery.matches);
+            mediaQuery.addEventListener("change", handleChange);
+
+            // Limpeza do event listener quando o componente for desmontado
+            return () => {
+                mediaQuery.removeEventListener("change", handleChange);
+            };
+        }
+    }, []);
+
 
     const [name, setName] = useState("");
     const [price, setPrice] = useState("");

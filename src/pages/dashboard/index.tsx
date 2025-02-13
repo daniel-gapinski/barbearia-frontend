@@ -5,7 +5,7 @@ import { Sidebar } from "@/components/sidebar";
 import Link from "next/link";
 import { IoMdPerson } from "react-icons/io";
 import { setupAPIClient } from "@/services/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ModalInfo } from "@/components/modal";
 import { toast } from "react-toastify";
 
@@ -30,9 +30,26 @@ export default function Dashboard({ schedule }: DashboardProps) {
 
     const [list, setList] = useState(schedule);
     const [service, setService] = useState<ScheduleItem>();
-    const [isMobile] = useMediaQuery(["(max-width: 500px)"], {
-        ssr: false,
-      });
+
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        // Verifica se o código está sendo executado no cliente
+        if (typeof window !== "undefined") {
+            const mediaQuery = window.matchMedia("(max-width: 500px)");
+            setIsMobile(mediaQuery.matches);
+
+            // Adiciona um event listener para detectar mudanças na largura da tela
+            const handleChange = () => setIsMobile(mediaQuery.matches);
+            mediaQuery.addEventListener("change", handleChange);
+
+            // Limpeza do event listener quando o componente for desmontado
+            return () => {
+                mediaQuery.removeEventListener("change", handleChange);
+            };
+        }
+    }, []);
+
 
     function handleOpenModal(item: ScheduleItem) {
         //console.log(item);
@@ -43,7 +60,7 @@ export default function Dashboard({ schedule }: DashboardProps) {
     async function handleFinish(id: string) {
         //console.log(id);
 
-        try{
+        try {
             const apiClient = setupAPIClient();
             await apiClient.delete("/schedule", {
                 params: {
@@ -56,7 +73,7 @@ export default function Dashboard({ schedule }: DashboardProps) {
             setList(filterItem);
             onClose();
 
-        }catch(err) {
+        } catch (err) {
             //console.log(err);
             onClose();
             toast.error("Erro ao finalizar serviço!");
@@ -141,15 +158,15 @@ export default function Dashboard({ schedule }: DashboardProps) {
 
                 </Flex>
             </Sidebar>
-            
+
 
             <ModalInfo
                 isOpen={open}
                 onOpen={onOpen}
                 onClose={onClose}
                 data={service}
-                finishService={ async () => handleFinish(service?.id)}
-            /> 
+                finishService={async () => handleFinish(service?.id)}
+            />
 
         </>
     )

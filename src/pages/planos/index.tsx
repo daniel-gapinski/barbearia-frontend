@@ -4,6 +4,7 @@ import { canSSRAuth } from "@/utils/canSSRAuth";
 import { Sidebar } from "@/components/sidebar";
 import { setupAPIClient } from "@/services/api";
 import { getStripeJs } from "@/services/stripe-js";
+import { useEffect, useState } from "react";
 
 
 interface PlanosProps {
@@ -12,12 +13,28 @@ interface PlanosProps {
 
 export default function Planos({ premium }: PlanosProps) {
 
-    const [isMobile] = useMediaQuery(["(max-width: 500px)"], {
-        ssr: false,
-      });
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        // Verifica se o código está sendo executado no cliente
+        if (typeof window !== "undefined") {
+            const mediaQuery = window.matchMedia("(max-width: 500px)");
+            setIsMobile(mediaQuery.matches);
+
+            // Adiciona um event listener para detectar mudanças na largura da tela
+            const handleChange = () => setIsMobile(mediaQuery.matches);
+            mediaQuery.addEventListener("change", handleChange);
+
+            // Limpeza do event listener quando o componente for desmontado
+            return () => {
+                mediaQuery.removeEventListener("change", handleChange);
+            };
+        }
+    }, []);
+
 
     const handleSubscribe = async () => {
-        if(premium) {
+        if (premium) {
             return;
         }
 
@@ -30,14 +47,14 @@ export default function Planos({ premium }: PlanosProps) {
             const stripe = await getStripeJs();
             await stripe.redirectToCheckout({ sessionId: sessionId });
 
-        }catch(err) {
+        } catch (err) {
             console.log("Erro ao registrar pagamento: ", err);
         }
     }
 
     async function handleCreatePortal() {
         try {
-            if(!premium) {
+            if (!premium) {
                 return;
             }
 
@@ -48,7 +65,7 @@ export default function Planos({ premium }: PlanosProps) {
 
             window.location.href = sessionId;
 
-        }catch(err) {
+        } catch (err) {
             console.log(err);
         }
     }
@@ -77,7 +94,7 @@ export default function Planos({ premium }: PlanosProps) {
 
                 <Flex pb={8} maxW="1024px" mx="auto" w="100%" direction="column" align="flex-start" justify="flex-start">
                     <Flex width="100%" gap={4} direction={isMobile ? "column" : "row"}>
-                        <Flex  color="#fff" rounded={4} p={2} flex={1} bg="barber.400" direction="column">
+                        <Flex color="#fff" rounded={4} p={2} flex={1} bg="barber.400" direction="column">
                             <Heading
                                 fontSize={isMobile ? "28px" : "xl"}
                                 mt={4}
@@ -93,7 +110,7 @@ export default function Planos({ premium }: PlanosProps) {
                             <Text ml={4} mb={2}>- Editar dados do perfil</Text>
                         </Flex>
 
-                        <Flex  color="#fff" rounded={4} p={2} flex={1} bg="barber.400" direction="column">
+                        <Flex color="#fff" rounded={4} p={2} flex={1} bg="barber.400" direction="column">
                             <Heading
                                 fontSize={isMobile ? "28px" : "xl"}
                                 mt={4}
@@ -112,10 +129,10 @@ export default function Planos({ premium }: PlanosProps) {
                             <Text fontSize="21px" color="orange.900" ml={4} mt={2}> R$ 9,99/mês</Text>
                             <Button
                                 disabled={premium}
-                                onClick={handleSubscribe} 
-                                mt={3} mb={3} 
+                                onClick={handleSubscribe}
+                                mt={3} mb={3}
                                 bg={premium ? "white" : "button.cta"}>
-                                    {premium ? "Você já é Premium!" : "Assinar"}
+                                {premium ? "Você já é Premium!" : "Assinar"}
                             </Button>
                             {premium && (
                                 <Button onClick={handleCreatePortal} bg="orange.900" mt={1} mb={1} >Alterar Assinatura</Button>
@@ -145,10 +162,10 @@ export const getServerSideProps = canSSRAuth(async (ctx) => {
     } catch (err) {
         console.log(err);
         return {
-           redirect: {
+            redirect: {
                 destination: "/dashboard",
                 permanent: false,
-           }
+            }
         }
     }
 

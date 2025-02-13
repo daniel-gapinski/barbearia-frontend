@@ -4,7 +4,7 @@ import { canSSRAuth } from "@/utils/canSSRAuth";
 import { Sidebar } from "@/components/sidebar";
 import { FiChevronLeft } from "react-icons/fi";
 import Link from "next/link";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { setupAPIClient } from "@/services/api";
 import { useRouter } from "next/router";
 import {
@@ -33,9 +33,25 @@ export default function New({ haircuts }: NewProps) {
 
     const router = useRouter();
 
-    const [isMobile] = useMediaQuery(["(max-width: 500px)"], {
-        ssr: false,
-      });
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        // Verifica se o código está sendo executado no cliente
+        if (typeof window !== "undefined") {
+            const mediaQuery = window.matchMedia("(max-width: 500px)");
+            setIsMobile(mediaQuery.matches);
+
+            // Adiciona um event listener para detectar mudanças na largura da tela
+            const handleChange = () => setIsMobile(mediaQuery.matches);
+            mediaQuery.addEventListener("change", handleChange);
+
+            // Limpeza do event listener quando o componente for desmontado
+            return () => {
+                mediaQuery.removeEventListener("change", handleChange);
+            };
+        }
+    }, []);
+
 
     const [customer, setCustomer] = useState("");
     const [haircutSelected, setHaircutSelected] = useState(haircuts[0]);
@@ -132,7 +148,7 @@ export default function New({ haircuts }: NewProps) {
                         </Flex>
 
                         <Flex w="100%" align="center" justify="center" mb={4}>
-                            <SelectRoot collection={haircutItems} w="85%" bg="barber.900"> 
+                            <SelectRoot collection={haircutItems} w="85%" bg="barber.900">
                                 <SelectTrigger>
                                     <SelectValueText placeholder="Selecione o corte desejado" />
                                 </SelectTrigger>

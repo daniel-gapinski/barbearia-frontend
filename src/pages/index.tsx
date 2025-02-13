@@ -1,12 +1,28 @@
 import Head from "next/head";
 import { Flex, Text, Button, useMediaQuery } from "@chakra-ui/react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Home() {
 
-  const [isMobile] = useMediaQuery(["(max-width: 500px)"], {
-    ssr: false,
-  });
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Verifica se o código está sendo executado no cliente
+    if (typeof window !== "undefined") {
+      const mediaQuery = window.matchMedia("(max-width: 500px)");
+      setIsMobile(mediaQuery.matches);
+
+      // Adiciona um event listener para detectar mudanças na largura da tela
+      const handleChange = () => setIsMobile(mediaQuery.matches);
+      mediaQuery.addEventListener("change", handleChange);
+
+      // Limpeza do event listener quando o componente for desmontado
+      return () => {
+        mediaQuery.removeEventListener("change", handleChange);
+      };
+    }
+  }, []);
 
   return (
     <>
