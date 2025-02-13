@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { Button, Flex, Heading, Input, useMediaQuery, createListCollection } from "@chakra-ui/react";
+import { Button, Flex, Heading, Input, createListCollection } from "@chakra-ui/react";
 import { canSSRAuth } from "@/utils/canSSRAuth";
 import { Sidebar } from "@/components/sidebar";
 import { FiChevronLeft } from "react-icons/fi";
@@ -10,11 +10,11 @@ import { useRouter } from "next/router";
 import {
     SelectContent,
     SelectItem,
-    SelectLabel,
     SelectRoot,
     SelectTrigger,
     SelectValueText,
 } from "@/components/ui/select";
+import { toast } from "react-toastify";
 
 interface HaircutProps {
     id: string;
@@ -65,7 +65,7 @@ export default function New({ haircuts }: NewProps) {
 
     async function handleRegister() {
         if (customer === "") {
-            alert("Preencha o nome do cliente!");
+            toast.warn("Preencha o nome do cliente!");
             return;
         }
         try {
@@ -78,7 +78,7 @@ export default function New({ haircuts }: NewProps) {
 
         } catch (err) {
             console.log(err);
-            alert("Erro ao registrar!");
+            toast.error("Erro ao registrar!");
         }
     }
 
@@ -136,7 +136,7 @@ export default function New({ haircuts }: NewProps) {
 
                         <Flex w="100%" align="center" justify="center" mb={4}>
                             <Input
-                                color="gray.100"
+                                color="#fff"
                                 size="md"
                                 placeholder="Insira o nome do cliente"
                                 width="85%"
@@ -148,13 +148,13 @@ export default function New({ haircuts }: NewProps) {
                         </Flex>
 
                         <Flex w="100%" align="center" justify="center" mb={4}>
-                            <SelectRoot collection={haircutItems} w="85%" bg="barber.900">
+                            <SelectRoot collection={haircutItems} w="85%" bg="barber.900" color="#FFF">
                                 <SelectTrigger>
-                                    <SelectValueText placeholder="Selecione o corte desejado" />
+                                    <SelectValueText color="#FFF" placeholder="Selecione o corte desejado" />
                                 </SelectTrigger>
                                 <SelectContent bg="barber.900">
                                     {haircutItems.items.map((haircut) => (
-                                        <SelectItem key={haircut.value} item={haircut} onClick={() => handleChangeSelect(haircut.value)}>
+                                        <SelectItem color="#FFF" key={haircut.value} item={haircut} onClick={() => handleChangeSelect(haircut.value)}>
                                             {haircut.label}
                                         </SelectItem>
                                     ))}

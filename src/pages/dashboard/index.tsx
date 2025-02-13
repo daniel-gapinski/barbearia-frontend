@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { Button, Flex, Heading, useDisclosure, Text, useMediaQuery, Link as ChakraLink } from "@chakra-ui/react";
+import { Button, Flex, Heading, useDisclosure, Text, Link as ChakraLink } from "@chakra-ui/react";
 import { canSSRAuth } from "@/utils/canSSRAuth";
 import { Sidebar } from "@/components/sidebar";
 import Link from "next/link";
@@ -129,8 +129,8 @@ export default function Dashboard({ schedule }: DashboardProps) {
                             onClick={() => handleOpenModal(item)}
                             key={item?.id}
                             w="100%"
-                            m={0}
-                            p={0}
+                            maxW="1024px"
+                            mx="auto"
                             mt={1}
                             bg="transparent"
                         >

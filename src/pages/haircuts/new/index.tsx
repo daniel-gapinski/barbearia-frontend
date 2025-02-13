@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { Button, Flex, Heading, Text, Input, useMediaQuery } from "@chakra-ui/react";
+import { Button, Flex, Heading, Text, Input } from "@chakra-ui/react";
 import { canSSRAuth } from "@/utils/canSSRAuth";
 import { Sidebar } from "@/components/sidebar";
 import { FiChevronLeft } from "react-icons/fi";
@@ -105,11 +105,12 @@ export default function NewHaircut({ subscription, count }: NewHaircutProps) {
 
                         <Flex w="100%" align="center" justify="center" mb={4}>
                             <Input
-                                color="gray.100"
+                                color="#FFF"
                                 size="md"
                                 placeholder="Nome do corte"
                                 width="85%"
                                 type="text"
+                                bg="barber.900"
                                 disabled={!subscription && count >= 3}
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
@@ -118,10 +119,11 @@ export default function NewHaircut({ subscription, count }: NewHaircutProps) {
 
                         <Flex w="100%" align="center" justify="center" mb={4}>
                             <Input
-                                color="gray.100"
+                                color="#FFF"
                                 size="md"
                                 placeholder="Valor do corte"
                                 width="85%"
+                                bg="barber.900"
                                 type="text"
                                 disabled={!subscription && count >= 3}
                                 value={price}
