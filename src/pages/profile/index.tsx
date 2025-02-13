@@ -6,6 +6,7 @@ import { canSSRAuth } from "@/utils/canSSRAuth";
 import { useContext, useState } from "react";
 import { AuthContext } from "@/contexts/AuthContext";
 import { setupAPIClient } from "@/services/api";
+import { toast } from "react-toastify";
 
 interface UserProps {
     is: string;
@@ -18,7 +19,6 @@ interface ProfileProps {
     user: UserProps;
     premium: boolean;
 }
-
 
 export default function Profile({ user, premium }: ProfileProps) {
 
@@ -43,7 +43,7 @@ export default function Profile({ user, premium }: ProfileProps) {
                 name: name,
                 endereco: endereco,
             });
-            alert("Dados alterados com sucessso!");
+            toast.success("Atualizado com sucesso!");
         }catch(err) {
             console.log(err);
         }
@@ -70,9 +70,9 @@ export default function Profile({ user, premium }: ProfileProps) {
                             <Text color="gray.100">Nome da barbearia:</Text>
                             <Input
                                 w="100%"
-                                bg="gray.900"
+                                bg="barber.900"
                                 placeholder="Nome da barbearia"
-                                borderColor="barber.700"
+                                borderColor="barber.400"
                                 color="gray.100"
                                 value={name}
                                 onChange={ (e) => setName(e.target.value)}
@@ -83,9 +83,9 @@ export default function Profile({ user, premium }: ProfileProps) {
                             <Text color="gray.100">Endereço:</Text>
                             <Input
                                 w="100%"
-                                bg="gray.900"
+                                bg="barber.900"
                                 placeholder="Endereço"
-                                borderColor="barber.700"
+                                borderColor="barber.400"
                                 color="gray.100"
                                 value={endereco}
                                 onChange={ (e) => setEndereco(e.target.value)}
@@ -96,7 +96,8 @@ export default function Profile({ user, premium }: ProfileProps) {
                             color="gray.100"
                             direction="row"
                             gap={2} w="85%"
-                            mb={5} bg="barber.900"
+                            mb={5} 
+                            bg="barber.900"
                             p={1}
                             borderColor="barber.400"
                             borderWidth={1}
@@ -123,7 +124,12 @@ export default function Profile({ user, premium }: ProfileProps) {
                         </Flex>
 
                         <Flex w="100%" pr={5} pl={5} mt={5} direction="column" gap={3}>
-                            <Button onClick={handleUpdateUser} bg="button.cta" _hover={{ bg: "#ffb13e" }}>
+                            <Button 
+                                onClick={handleUpdateUser} 
+                                bg="button.cta" 
+                                _hover={{ bg: "#ffb13e" }}
+
+                            >
                                 Salvar
                             </Button>
                             <Button 

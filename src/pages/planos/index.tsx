@@ -12,7 +12,9 @@ interface PlanosProps {
 
 export default function Planos({ premium }: PlanosProps) {
 
-    const [isMobile] = useMediaQuery("(max-width: 500px)");
+    const [isMobile] = useMediaQuery(["(max-width: 500px)"], {
+        ssr: false,
+      });
 
     const handleSubscribe = async () => {
         if(premium) {

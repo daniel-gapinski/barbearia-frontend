@@ -7,6 +7,7 @@ import { IoMdPerson } from "react-icons/io";
 import { setupAPIClient } from "@/services/api";
 import { useState } from "react";
 import { ModalInfo } from "@/components/modal";
+import { toast } from "react-toastify";
 
 export interface ScheduleItem {
     id: string;
@@ -25,11 +26,13 @@ interface DashboardProps {
 
 export default function Dashboard({ schedule }: DashboardProps) {
 
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { open, onOpen, onClose } = useDisclosure();
 
     const [list, setList] = useState(schedule);
     const [service, setService] = useState<ScheduleItem>();
-    const [isMobile] = useMediaQuery("(max-width: 500px)");
+    const [isMobile] = useMediaQuery(["(max-width: 500px)"], {
+        ssr: false,
+      });
 
     function handleOpenModal(item: ScheduleItem) {
         //console.log(item);
@@ -54,9 +57,9 @@ export default function Dashboard({ schedule }: DashboardProps) {
             onClose();
 
         }catch(err) {
-            console.log(err);
+            //console.log(err);
             onClose();
-            alert("Ero ao finalizar serviço!");
+            toast.error("Erro ao finalizar serviço!");
         }
     }
 
@@ -98,6 +101,12 @@ export default function Dashboard({ schedule }: DashboardProps) {
                         </Link>
                     </Flex>
 
+                    {list.length === 0 && (
+                        <Flex justify="center" alignItems="center" textAlign="center" w="100%" mt={10}>
+                            <Text fontSize={19}>Nenhum agendamento até o momento!</Text>
+                        </Flex>
+                    )}
+
                     {list.map(item => (
                         <ChakraLink
                             onClick={() => handleOpenModal(item)}
@@ -120,7 +129,7 @@ export default function Dashboard({ schedule }: DashboardProps) {
                             >
                                 <Flex direction={isMobile ? "column" : "row"} align="center" mx={isMobile ? "auto" : 0} justify="center" gap={2} mb={isMobile ? 2 : 0}>
                                     <IoMdPerson size={28} color="#fba931" />
-                                    <Text noOfLines={2} color="#f1f1f1">{item?.customer}</Text>
+                                    <Text lineClamp={2} color="#f1f1f1">{item?.customer}</Text>
                                 </Flex>
 
                                 <Text mx={isMobile ? "auto" : 0} color="#fba931">{item?.haircut?.name}</Text>
@@ -133,13 +142,14 @@ export default function Dashboard({ schedule }: DashboardProps) {
                 </Flex>
             </Sidebar>
             
+
             <ModalInfo
-                isOpen={isOpen}
+                isOpen={open}
                 onOpen={onOpen}
                 onClose={onClose}
                 data={service}
                 finishService={ async () => handleFinish(service?.id)}
-            />
+            /> 
 
         </>
     )

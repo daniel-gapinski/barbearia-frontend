@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { Button, Flex, Heading, Text, Input, useMediaQuery, Select } from "@chakra-ui/react";
+import { Button, Flex, Heading, Input, useMediaQuery, createListCollection } from "@chakra-ui/react";
 import { canSSRAuth } from "@/utils/canSSRAuth";
 import { Sidebar } from "@/components/sidebar";
 import { FiChevronLeft } from "react-icons/fi";
@@ -7,6 +7,14 @@ import Link from "next/link";
 import { ChangeEvent, useState } from "react";
 import { setupAPIClient } from "@/services/api";
 import { useRouter } from "next/router";
+import {
+    SelectContent,
+    SelectItem,
+    SelectLabel,
+    SelectRoot,
+    SelectTrigger,
+    SelectValueText,
+} from "@/components/ui/select";
 
 interface HaircutProps {
     id: string;
@@ -25,7 +33,9 @@ export default function New({ haircuts }: NewProps) {
 
     const router = useRouter();
 
-    const [isMobile] = useMediaQuery("(max-width: 500px)");
+    const [isMobile] = useMediaQuery(["(max-width: 500px)"], {
+        ssr: false,
+      });
 
     const [customer, setCustomer] = useState("");
     const [haircutSelected, setHaircutSelected] = useState(haircuts[0]);
@@ -38,7 +48,7 @@ export default function New({ haircuts }: NewProps) {
     }
 
     async function handleRegister() {
-        if(customer === "") {
+        if (customer === "") {
             alert("Preencha o nome do cliente!");
             return;
         }
@@ -50,11 +60,18 @@ export default function New({ haircuts }: NewProps) {
             });
             router.push("/dashboard");
 
-        }catch(err) {
+        } catch (err) {
             console.log(err);
             alert("Erro ao registrar!");
         }
     }
+
+    const haircutItems = createListCollection({
+        items: haircuts.map(haircut => ({
+            label: haircut?.name,
+            value: haircut?.id,
+        }))
+    })
 
     return (
         <>
@@ -108,21 +125,25 @@ export default function New({ haircuts }: NewProps) {
                                 placeholder="Insira o nome do cliente"
                                 width="85%"
                                 type="text"
+                                bg="barber.900"
                                 value={customer}
                                 onChange={(e: ChangeEvent<HTMLInputElement>) => setCustomer(e.target.value)}
                             />
                         </Flex>
 
                         <Flex w="100%" align="center" justify="center" mb={4}>
-                            <Select
-                            width="85%"
-                            color="gray.100"
-                            onChange={(e) => handleChangeSelect(e.target.value)}
-                            >
-                                {haircuts?.map(item => (
-                                    <option style={{ background: "#12131b" }} key={item?.id} value={item?.id}>{item?.name}</option>
-                                ))}
-                            </Select>
+                            <SelectRoot collection={haircutItems} w="85%" bg="barber.900"> 
+                                <SelectTrigger>
+                                    <SelectValueText placeholder="Selecione o corte desejado" />
+                                </SelectTrigger>
+                                <SelectContent bg="barber.900">
+                                    {haircutItems.items.map((haircut) => (
+                                        <SelectItem key={haircut.value} item={haircut} onClick={() => handleChangeSelect(haircut.value)}>
+                                            {haircut.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </SelectRoot>
                         </Flex>
 
                         <Button
@@ -152,14 +173,14 @@ export const getServerSideProps = canSSRAuth(async (ctx) => {
                 status: true,
             }
         });
-        if(response.data === null) {
+        if (response.data === null) {
             return {
                 redirect: {
                     destination: "/dashboard",
                     permanent: false,
                 }
             }
-        } 
+        }
 
         //console.log(response.data);
         return {
@@ -168,7 +189,7 @@ export const getServerSideProps = canSSRAuth(async (ctx) => {
             }
         }
 
-    }catch(err) {
+    } catch (err) {
         console.log(err);
 
         return {

@@ -1,8 +1,13 @@
 import Head from "next/head";
-import { Flex, Text, Button } from "@chakra-ui/react";
+import { Flex, Text, Button, useMediaQuery } from "@chakra-ui/react";
 import Link from "next/link";
 
 export default function Home() {
+
+  const [isMobile] = useMediaQuery(["(max-width: 500px)"], {
+    ssr: false,
+  });
+
   return (
     <>
       <Head>
@@ -13,12 +18,12 @@ export default function Home() {
       </Head>
 
       <Flex background="barber.900" height="100vh" alignItems="center" justifyContent="center" direction="column">
-        <Flex mb={5} gap={4}>
-        <Text color="#FFF" fontSize={48} fontWeight="bold">Bem-vindo ao</Text>
-        <Text color="orange.900" fontSize={48} fontWeight="bold">Barber!</Text>
+        <Flex mb={5} gap={4} direction={isMobile ? "column" : "row"} align={isMobile ? "center" : "flex-start"}>
+          <Text color="#FFF" fontSize={isMobile ? "28px" : "4xl"} fontWeight="bold">Bem-vindo ao</Text>
+          <Text color="orange.900" fontSize="4xl" fontWeight="bold">Barber!</Text>
         </Flex>
         <Button bg="orange.900">
-          <Link style={{ color: "#000 "}} href="/login">Entrar</Link>
+          <Link style={{ color: "#000 " }} href="/login">Entrar</Link>
         </Button>
       </Flex>
 

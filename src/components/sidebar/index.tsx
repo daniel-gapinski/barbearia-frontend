@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { FiScissors, FiClipboard, FiSettings, FiMenu } from "react-icons/fi";
 import { IconType } from "react-icons";
 import Link from "next/link";
@@ -8,14 +8,19 @@ import {
   CloseButton,
   Flex,
   Icon,
-  Drawer,
-  DrawerContent,
-  useColorModeValue,
   Text,
   useDisclosure,
   BoxProps,
   FlexProps,
+  DrawerBody,
 } from "@chakra-ui/react";
+import {
+  DrawerBackdrop,
+  DrawerContent,
+  DrawerHeader,
+  DrawerRoot,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 interface LinkItemProps {
   name: string;
@@ -31,36 +36,50 @@ const linkItems: Array<LinkItemProps> = [
 
 export function Sidebar({ children }: { children: ReactNode }) {
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  
+  const { open, onOpen, onClose } = useDisclosure();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
   return (
     <Box
       minH="100vh"
       bg="barber.900"
     >
       <SidebarContent
-        onClose={ () => onClose}
+        onClose={() => onClose}
         display={{ base: "none", md: "block" }}
       />
-      <Drawer
-        autoFocus={false}
-        isOpen={isOpen}
-        placement="left"
-        returnFocusOnClose={false}
-        onOverlayClick={onClose}
-        size="full"
-        onClose={onClose}
-      >
-        <DrawerContent>
-          <SidebarContent onClose={ () => onClose()} />
-        </DrawerContent>
-      </Drawer>
+      <DrawerRoot size="full" open={open} onOpenChange={(e) => setIsDrawerOpen(e.open)} placement="start">
+        <DrawerBackdrop />
+        <DrawerTrigger asChild>
+          <DrawerContent bg="barber.900">
+            <DrawerHeader>
+              <Flex justify="space-between" alignItems="center">
+                <Flex direction="row">
+                  <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">Bar</Text>
+                  <Text color="button.cta" fontSize="2xl" fontFamily="monospace" fontWeight="bold">ber</Text>
+                </Flex>
+                <CloseButton onClick={onClose} />
+              </Flex>
+            </DrawerHeader>
+            <DrawerBody>
+              <Box px={4}>
+                {linkItems.map(link => (
+                  <NavItem icon={link.icon} route={link.route} key={link.name}>
+                    {link.name}
+                  </NavItem>
+                ))}
+              </Box>
+            </DrawerBody>
+          </DrawerContent>
+
+        </DrawerTrigger>
+      </DrawerRoot>
 
       <MobileNav display={{ base: "flex", md: "none" }} onOpen={onOpen} />
 
-        <Box ml={{ base: 0, md: 60 }} p={4}>
-          {children}
-        </Box>
+      <Box ml={{ base: 0, md: 60 }} p={4}>
+        {children}
+      </Box>
     </Box>
   )
 }
@@ -74,7 +93,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
     <Box
       bg="barber.400"
       borderRight="1px"
-      borderRightColor={useColorModeValue("gray.700", "gray.700")}
+      borderRightColor="gray.700"
       w={{ base: "full", md: 60 }}
       pos="fixed"
       h="full"
@@ -136,7 +155,7 @@ interface MobileProps extends FlexProps {
   onOpen: () => void;
 }
 
-const MobileNav = ({ onOpen, ...rest }: MobileProps ) => {
+const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -147,12 +166,13 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps ) => {
       justifyContent="flex-start"
       {...rest}
     >
-      <IconButton variant="outline" color="white" onClick={onOpen} aria-label="open menu" icon={ <FiMenu />} />
-      
+      <IconButton variant="outline" color="white" onClick={onOpen} aria-label="open menu" >
+        <FiMenu />
+      </IconButton>
       <Flex flexDirection="row" ml={5}>
-            <Text fontSize="2xl" color="white" fontFamily="monospace" fontWeight="bold">Bar</Text>
-            <Text color="button.cta" fontSize="2xl" fontFamily="monospace" fontWeight="bold">ber</Text>
-          </Flex>
+        <Text fontSize="2xl" color="white" fontFamily="monospace" fontWeight="bold">Bar</Text>
+        <Text color="button.cta" fontSize="2xl" fontFamily="monospace" fontWeight="bold">ber</Text>
+      </Flex>
     </Flex>
   )
 }

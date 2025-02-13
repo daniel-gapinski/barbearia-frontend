@@ -42,7 +42,7 @@ export default function Login() {
                     <Input
                         background="barber.400"
                         color="barber.100"
-                        variant="filled"
+                        variant="outline"
                         size="lg"
                         type="email"
                         placeholder="email@email.com"
@@ -54,7 +54,7 @@ export default function Login() {
                     <Input
                         background="barber.400"
                         color="barber.100"
-                        variant="filled"
+                        variant="outline"
                         size="lg"
                         type="password"
                         placeholder="***********"

@@ -1,11 +1,12 @@
 import Head from "next/head";
-import { Button, Flex, Heading, Text, Stack, Switch, useMediaQuery } from "@chakra-ui/react";
+import { Button, Flex, Heading, Text, Stack, useMediaQuery } from "@chakra-ui/react";
 import { canSSRAuth } from "@/utils/canSSRAuth";
 import { Sidebar } from "@/components/sidebar";
 import { IoMdPricetag } from "react-icons/io";
-import { useState, ChangeEvent } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { setupAPIClient } from "@/services/api";
+import { Switch } from "@/components/ui/switch";
 
 interface HaircutsItem {
     id: string;
@@ -21,37 +22,36 @@ interface HaircutsProps {
 
 export default function Haircuts({ haircuts }: HaircutsProps) {
 
-    const [isMobile] = useMediaQuery("(max-width: 500px)");
+    const [isMobile] = useMediaQuery(["(max-width: 500px)"], {
+        ssr: false,
+    }); 
 
     const [haircutList, setHaircutList] = useState<HaircutsItem[]>(haircuts || []);
     const [disabledHaircut, setDisabledHaircut] = useState("enable");
 
-    async function handleDisable(e: ChangeEvent<HTMLInputElement>) {
-        //console.log(e.target.value);
 
+    async function handleDisable(disabledHaircut: string, setDisabledHaircut: React.Dispatch<React.SetStateAction<string>>) {
         const apiClient = setupAPIClient();
 
-        if(e.target.value === "disabled") {
+        if (disabledHaircut === "disabled") {
             setDisabledHaircut("enable");
-            //console.log("ativando");
-
-            const response = await apiClient.get("/haircuts", {
-               params: {
-                    status: true,
-               } 
-            });
-            setHaircutList(response.data);
-
-        }else {
-            setDisabledHaircut("disabled");
-            //console.log("desativando");
 
             const response = await apiClient.get("/haircuts", {
                 params: {
-                     status: false,
-                } 
-             });
-             setHaircutList(response.data);
+                    status: true,
+                }
+            });
+            setHaircutList(response.data);
+
+        } else {
+            setDisabledHaircut("disabled");
+
+            const response = await apiClient.get("/haircuts", {
+                params: {
+                    status: false,
+                }
+            });
+            setHaircutList(response.data);
         }
     }
 
@@ -101,11 +101,11 @@ export default function Haircuts({ haircuts }: HaircutsProps) {
                                 ATIVOS
                             </Text>
                             <Switch
-                                colorScheme="green"
+                                colorScheme="red"
                                 size="lg"
                                 value={disabledHaircut}
-                                onChange={ (e: ChangeEvent<HTMLInputElement>) => handleDisable(e)}
-                                isChecked={disabledHaircut === "disabled" ? false : true}
+                                checked={disabledHaircut === "disabled" ? false : true}
+                                onCheckedChange={() => { handleDisable(disabledHaircut, setDisabledHaircut) }}
                             />
                         </Stack>
                     </Flex>
@@ -116,6 +116,8 @@ export default function Haircuts({ haircuts }: HaircutsProps) {
                                 mt={2}
                                 color="gray.100"
                                 w="100%"
+                                maxW="1024px"
+                                mx="auto"
                                 cursor="pointer"
                                 p={4}
                                 bg="barber.400"
@@ -127,7 +129,7 @@ export default function Haircuts({ haircuts }: HaircutsProps) {
                             >
                                 <Flex gap={3} alignItems="center" justifyContent="center">
                                     <IoMdPricetag size={28} color="#fba931" />
-                                    <Text fontWeight="bold" noOfLines={2}>{haircut.name}</Text>
+                                    <Text fontWeight="bold" lineClamp={2}>{haircut.name}</Text>
                                 </Flex>
 
                                 <Text fontWeight="bold" color="orange.900">R$ {haircut.price}</Text>

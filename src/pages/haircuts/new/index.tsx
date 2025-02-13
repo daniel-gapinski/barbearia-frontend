@@ -15,7 +15,9 @@ interface NewHaircutProps {
 
 export default function NewHaircut({ subscription, count }: NewHaircutProps) {
 
-    const [isMobile] = useMediaQuery("(max-width: 500px)");
+    const [isMobile] = useMediaQuery(["(max-width: 500px)"], {
+        ssr: false,
+      });
 
     const [name, setName] = useState("");
     const [price, setPrice] = useState("");

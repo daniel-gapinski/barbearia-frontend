@@ -1,6 +1,6 @@
 
 import Head from "next/head";
-import { Button, Flex, Heading, Text, Input, useMediaQuery, Switch, Stack } from "@chakra-ui/react";
+import { Button, Flex, Heading, Text, Input, useMediaQuery, Stack } from "@chakra-ui/react";
 import { canSSRAuth } from "@/utils/canSSRAuth";
 import { Sidebar } from "@/components/sidebar";
 import { FiChevronLeft } from "react-icons/fi";
@@ -8,6 +8,7 @@ import Link from "next/link";
 import { setupAPIClient } from "@/services/api";
 import { ChangeEvent, useState } from "react";
 import Router from "next/router";
+import { Switch } from "@/components/ui/switch";
 
 interface HaircutProps {
     id: string;
@@ -31,23 +32,20 @@ export default function EditHaircut({ subscription, haircut }: EditHaircutProps)
 
     const [name, setName] = useState(haircut ? haircut?.name : "");
     const [price, setPrice] = useState(haircut ? haircut?.price : "");
-    const [status, setStatus] = useState(haircut?.status);
-    const [disabledHaircut, setDisabledHaircut] = useState(haircut?.status ? "disabled" : "enable");
+    const [status, setStatus] = useState<boolean>(haircut?.status);
 
-    const [isMobile] = useMediaQuery("(max-width: 500px)");
+    console.log(status)
 
-    function handleChangeStatus(e: ChangeEvent<HTMLInputElement>) {
-        if(e.target.value === "disabled") {
-            setDisabledHaircut("enable");
-            setStatus(false);
-        }else {
-            setDisabledHaircut("disabled");
-            setStatus(true);
-        }
+    const [isMobile] = useMediaQuery(["(max-width: 500px)"], {
+        ssr: false,
+      });
+
+    function handleChangeStatus() {
+        setStatus(prevStatus => !prevStatus); 
     }
 
     async function handleUpdate() {
-        if(name === "" || price === "") {
+        if (name === "" || price === "") {
             return;
         }
 
@@ -61,7 +59,7 @@ export default function EditHaircut({ subscription, haircut }: EditHaircutProps)
             });
             Router.push("/haircuts");
 
-        }catch(err) {
+        } catch (err) {
             console.log(err);
         }
     }
@@ -119,6 +117,7 @@ export default function EditHaircut({ subscription, haircut }: EditHaircutProps)
                                 placeholder="Nome do corte"
                                 width="85%"
                                 type="text"
+                                bg="barber.900"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                             />
@@ -132,6 +131,7 @@ export default function EditHaircut({ subscription, haircut }: EditHaircutProps)
                                 width="85%"
                                 type="text"
                                 value={price}
+                                bg="barber.900"
                                 onChange={(e) => setPrice(e.target.value)}
                             />
                         </Flex>
@@ -146,9 +146,8 @@ export default function EditHaircut({ subscription, haircut }: EditHaircutProps)
                             <Switch
                                 colorScheme="red"
                                 size="lg"
-                                value={disabledHaircut}
-                                isChecked={disabledHaircut === "disabled" ? false : true }
-                                onChange={(e: ChangeEvent<HTMLInputElement>) => handleChangeStatus(e) }
+                                checked={!status}
+                                onCheckedChange={handleChangeStatus}
                             />
                         </Stack>
 
